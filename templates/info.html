@@ -1,0 +1,1258 @@
+<!-- // _______auther: moogiegik -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='Personal or team information recording and text communication tools.png') }}" type="image/x-icon">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>notebook</title>
+</head>
+<style>
+    body{
+        display: flex;
+        flex-wrap: nowrap;
+        margin: 0;
+        background: black;
+        /* color: aliceblue; */
+        color: chartreuse;
+    }
+    .resource{
+        border: 1px green solid;
+        width: 28vw;
+        height: 98vh;
+        position: absolute;
+        background: rgb(18, 17, 26);
+        /* padding-left: 7px;
+        padding-right: 5px; */
+        /* color: white; */
+        padding: 0.5vw;
+        top: 0px;
+        left: 29.5vw;
+    }
+    .search{
+        /* border: 1px red solid; */
+        background: rgb(18, 17, 26);
+        width: 20vw;
+        height: 98vh;
+        position: absolute;
+        /* color: white; */
+        padding: 0;
+        top: 0px;
+        left:59vw;
+    }
+    .resourcePlus{
+        /* border: 1px red solid; */
+        width: 28vw;
+        height: 98vh;
+        position: absolute;
+        background: rgb(18, 17, 26);
+        /* color: white; */
+        top: 0px;
+        left: 0vw;
+    }
+    .handle{
+        /* border: 1px yellow solid; */
+        background: rgb(18, 17, 26);
+        width: 18vw;
+        height: 98vh;
+        position: absolute;
+        /* color: white; */
+        top: 0px;
+        left:80.5vw;
+    }
+    .spanButton{
+        display: inline-block;
+        background: none;
+        color: chartreuse;
+        align-items: center;
+        text-align: center;
+        line-height: 4vh;
+        font-size: 3vh;
+        /* height: 10vh; */
+        border: 1px green solid;
+        /* align-content: center; */
+        /* vertical-align: middle; */
+        /* line-height: 10vh; 使文字垂直居中 */
+
+        white-space: nowrap; /* 防止文字换行 */
+        overflow: hidden; /* 隐藏超出部分 */
+        text-overflow: ellipsis; /* 显示省略号 */
+        justify-content: center;
+        user-select: none;
+    }
+    .slim{
+        padding: 0;
+        margin: 0;
+    }
+    .angle_radius{
+        border-radius: 5px;
+    }
+    .Inp{
+        background: rgb(38, 51, 38);
+      /* border: 1px solid green; */
+        color: chartreuse;       
+        width: 100%; /* 设置宽度 */
+        height: 10vh;
+        /* min-height: 50px; /* 最小高度 */
+        /* max-height: 200px; 最大高度 */ 
+        /* overflow: hidden; 隐藏滚动条 */
+        resize: none; /* 禁止用户手动调整大小 */
+        padding: 5px; /* 添加内边距 */
+        box-sizing: border-box; /* 包含边框和内边距 */ 
+        border: 1px solid green;
+        margin-bottom: 1vh;
+        vertical-align: middle;
+    }
+    .white_border_radius{
+    border: 1px solid green;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    padding: 0.5vw;
+    /* padding: 8px; */
+    padding-bottom: 5px;
+    }
+    .title{
+        width: 100%;
+        height: 2vh;
+        text-align: center;
+        line-height: 1vh; 
+    }
+    .tipfull {
+        position: absolute;
+        /* background-color: #1c502ef6; */
+        background: rgb(38, 51, 38);
+        border: 1px solid green;
+        color: chartreuse; 
+        padding: 10px;
+        border-radius: 5px;
+        /* max-width: 300px; */
+        min-width: 300px;
+        display: none;
+        font-size: 14px;
+        pointer-events: none;
+    }
+</style>
+<body>
+    <!-- RESOURCE --><!-- NOTE -->
+    <div class="resource white_border_radius">
+        <div class="title" onclick="str2reg('/xx/g')">NOTES</div>
+        <textarea class=" slim angle_radius Inp" id="resourceInp" style="width: 100%;">info</textarea>
+        <div class="" style="display: flex; flex-wrap: nowrap;height: 4vh;">
+            <span class="spanButton angle_radius" onclick="resourceSQLADD_search()" style = "width: 50%;margin-bottom: 0;height: 4vh;">添加并搜索</span>
+            <span class="spanButton angle_radius" onclick="resourceInpEmpty(0)" style = "width: 25%;margin-bottom: 0;height: 4vh;">清空</span>
+            <span class="spanButton angle_radius" onclick="resourceSQLADD()" style = "width: 25%;margin-bottom: 0;height: 4vh;">添加</span>
+        </div>
+        <div id="resourceLoad1" class="white_border_radius observeSize"  style="height: 78vh;margin-top: 5px;">
+        </div>
+    </div>
+    <!-- SEARCH -->
+    <div class="search white_border_radius">
+        <div class="title" onclick="findFirstDivsInChildDivs('resourceLoad1')">SEARCH</div>
+        <div style="display: flex; flex-wrap: nowrap;">
+            <!-- website: -->
+            <textarea class=" slim angle_radius Inp" id="searchWbInp" style="width: 40%;">website</textarea>
+            <!-- Regular: -->
+            <textarea class=" slim angle_radius Inp" id="searchReInp" style="width: 22%;">Regular</textarea>   
+            <textarea class=" slim angle_radius Inp" id="searchNMInp" style="width: 18%;">name</textarea>   
+            <button class="spanButton angle_radius Inp" onclick="SearchSQLADD()" style="width: 20%;border: 1px solid green;">添加</button>
+        </div>
+        <div id="searchLoad" class="white_border_radius observeSize"  style="height: 82vh;margin-top: 5px;">.
+
+        </div>  
+    </div>
+    <!-- // _______auther: moogiegik -->
+    <!-- RESOURCE++ --><!-- NOTE++ -->
+    <div class="resourcePlus white_border_radius">
+        <div class="title">NOTES++</div>  
+        <div class="" style="display: flex; flex-wrap: nowrap;">
+            <!-- find: -->
+            <!-- <button class="spanButton angle_radius Inp" onclick="findSQL()" style="width: 20%;border: 1px solid green;height: 5vh;">取消</button> -->
+            <textarea class=" slim angle_radius Inp" id="findInp" style="width: 25%;height: 10vh;">info</textarea>
+            <div class="" style="display: flex; flex-direction: column;width: 15%;">
+                <button class="spanButton angle_radius Inp" onclick="getIP('IP',null);textareaFindInp.value = IP;" style="width: 100%;border: 1px solid green;height: 5vh;margin: 0;font-size: 1em;">IP</button>
+                <button class="spanButton angle_radius Inp" id="findBtn" onclick="findSQL()" style="width: 100%;border: 1px solid green;height: 5vh;margin: 0;font-size: 0.8em;">查找</button>
+            </div>
+            <textarea class=" slim angle_radius Inp" id="messageReceved" style="width: 60%;height: 10vh;"></textarea>
+        </div>
+        <div class="" style="display: flex; flex-direction: row;width: 100%;height: 5vh;">
+            <textarea class=" slim angle_radius Inp" id="messageName" style="width: 15%;height: 100%;">name</textarea>：
+            <textarea class=" slim angle_radius Inp" id="messageInp" placeholder="say someting…" style="width: 70%;height: 100%;">短信</textarea>
+            <button class="spanButton angle_radius Inp" id="findBtn" onclick="sendMsg(messageInp.value);messageInp.value='';"
+             style="width: 10%;border: 1px solid green;margin: 0;font-size: 0.9em;height: 100%;line-height: 100%;">发送</button>
+        </div>
+        <div id="resourceLoad2" class="white_border_radius observeSize"  style="height: 77.1vh;margin-top: 5px;">
+        </div>  
+    </div> 
+    <!--     // _______auther: moogiegik -->
+    <!-- HANDLE -->
+    <div class="handle white_border_radius">
+        <div class="title" >HANDLE</div>
+        <div class="" style="display: flex; flex-wrap: nowrap;">
+            <!-- text: -->
+            <textarea class=" slim angle_radius Inp" id="handleTxInp" style="width: 50%;">text</textarea>
+            <!-- Regular: -->
+            <textarea class=" slim angle_radius Inp" id="handleReInp" style="width: 25%;">Regular</textarea> 
+            <button class="spanButton angle_radius Inp" onclick="handleSQLADD()" style="width: 25%;border: 1px solid green;">添加</button>
+
+        </div>
+        <div id="handleLoad" class="white_border_radius observeSize"  style="height: 82vh;margin-top: 5px;">
+         
+        </div>
+        <!-- <span class="spanButton" style = "width:15vw;color: rgb(72, 75, 75);">搜索</span> -->
+    </div>
+
+        <!-- <input type="text" id="toFind" value="000001" style = "width: 90px;">
+        <div style="display: inline-block;padding-right: 5px;" onclick="exploreReqest(11,toFind.value);">查找</div> -->
+    <div id="tipfull" class="tipfull">全文显示</div>
+    <div id="allowAudioDiv" class="tipfull" style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            left: 40vw;top: 31vh;border: red solid 2px;width: 20vw;height: 20vh;pointer-events: auto;">
+        <button class="spanButton angle_radius Inp" id="allowAudioBtn" style="margin: 0%;width: 50%;font-size: 1em;margin-right: 10px;
+            border: red solid 2px;user-select: none;">
+            点击允许提示音
+        </button>
+    </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+        // _______auther: moogiegik
+    const socket = io();  // 默认连到当前页面同源
+//variable declaration
+    var resourceData1 = []
+    var resourceData2 = []
+    // var resourceData = []
+    var handleData = []
+    var searchData = []
+
+    var itemHeight = 6 // 每行的高度
+    var itemTrue_MG_top_Height = 1 // 每行的高度
+    var parentItemHeight = 26 // 每行的高度
+    // var itemTrueHeight = itemHeight+8+5+2+5 // 每行的高度
+    var itemTrueHeight = parentItemHeight+itemTrue_MG_top_Height // 每行的高度
+
+    // gapPx = 5 + window.innerHeight * 0.005; 
+    var LoadHeightLack = 5+1+(5 + window.innerHeight * 0.005); // 每行的高度
+
+    var row_of_resourceData1 = 0
+    var row_of_resourceData2 = 0    
+    var row_of_handleData = 0
+    var row_of_searchData = 0
+
+    var resourceData1RowIn = 0
+    var resourceData2RowIn = 0
+    var resourceData2FindRowIn = 0
+    var handleDataRowIn = 0
+    var searchDataRowIn = 0
+
+    var textareaResourceValue = "";
+
+    var IP;
+    // _______auther: moogiegik
+    const allowAudioDiv = document.getElementById('allowAudioDiv');
+    const allowAudioBtn = document.getElementById('allowAudioBtn');
+    // 浏览器是否已允许播放
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioUnlocked = false;
+
+    const messageReceved = document.getElementById('messageReceved');
+    const messageName = document.getElementById('messageName');
+    const messageInp = document.getElementById('messageInp');
+    const textareaFindInp = document.getElementById('findInp');
+    const textareaResource = document.getElementById('resourceInp');
+    const textareaHandleTxInp = document.getElementById('handleTxInp');
+    const textareaHandleReInp = document.getElementById('handleReInp');
+    const textareaSearchWbInp = document.getElementById('searchWbInp');
+    const textareaSearchReInp = document.getElementById('searchReInp');
+    const textareaSearchNMInp = document.getElementById('searchNMInp');
+
+    const resourceLoad1 = document.getElementById('resourceLoad1');
+    const resourceLoad2 = document.getElementById('resourceLoad2');
+    const handleLoad = document.getElementById('handleLoad');
+    const searchLoad = document.getElementById('searchLoad');
+    // _______auther: moogiegik
+    // const basicColors = ["#ae94ef","grenn", "red", "blue", "yellow", "orange", "brown"];
+    const basicColors = ["#ea5f44","#88e2d0","#4e7cfc"]//, "#f2a693", "#f46e84", "#ff8c75", "#f7eb80", "#ff8c75"];
+
+    const innerData = ["删","选"]
+
+    const findBtn = document.getElementById('findBtn');   
+
+    var selectedHandle = [0,[],""]
+
+    const beep = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+
+// <textarea>监听
+{    
+// <textarea> 根据内容自适应改变自身大小，但不超过某一最大值
+    // 监听输入事件
+    // textareaResource_wasted.addEventListener('input', function() {
+    //     // 调整高度
+    //     this.style.height = 'auto';
+    //     const newHeight = this.scrollHeight;
+    //     const minHeight = parseInt(window.getComputedStyle(this).minHeight, 10);
+    //     this.style.height = Math.max(newHeight, minHeight) + 'px';
+    // });
+    // // 初始化高度
+    // textareaResource_wasted.dispatchEvent(new Event('input'));
+    // 监听 focus 事件
+
+    textareaResource.addEventListener('input', function() {
+        // console.log("Resource Input Changed:", this.value);
+        selectedHandle[2] = doRegular(selectedHandle[1][1],this.value,selectedHandle[1][2])
+        textareaHandleTxInp.value = selectedHandle[2]
+        textareaResourceValue = this.value;
+        // console.log("doRegular", selectedHandle,JSON.parse(event.target.dataset.info))
+    });
+    textareaResource.addEventListener('focus', function() {
+        // 选中所有文本
+        this.select();
+    });    // _______auther: moogiegik
+    function resourceInpEmpty(target){
+        if(target == 0){
+            textareaResource.value = ""
+        }else if(target == 1){
+            textareaHandleTxInp.value = ""
+            textareaHandleReInp.value = ""
+        }
+    }
+    messageName.addEventListener('focus', function() {
+        this.select();
+    });
+    messageInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaHandleTxInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaHandleReInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaSearchWbInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaSearchReInp.addEventListener('focus', function() {
+        this.select();
+    });    // _______auther: moogiegik
+    textareaSearchNMInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaFindInp.addEventListener('focus', function() {
+        this.select();
+    });
+    textareaFindInp.addEventListener('input', function() {
+        resourceData2FindRowIn = 0
+        if(findBtn.textContent == "取消"){
+            findBtn.textContent = "查找";
+            findBtn.style.border = "1px solid green"
+            infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2]);
+        }
+    });
+}    // _______auther: moogiegik
+
+// listeners
+    // resourceLoad1 scroll listener
+    resourceLoad1.addEventListener('wheel', function(event) {
+        if (event.deltaY > 85 && resourceData1.length > 1) {
+            resourceData1RowIn++;
+            // console.log("resourceData1RowIn increased:", resourceData1RowIn);
+            infoSimpleReqest("query", 0, [resourceData1RowIn, row_of_resourceData1]);
+        } else if (event.deltaY < 85 && resourceData1RowIn > 0) {
+            resourceData1RowIn--;
+            // console.log("resourceData1RowIn decreased:", resourceData1RowIn);
+            infoSimpleReqest("query", 0, [resourceData1RowIn, row_of_resourceData1]);
+        }
+    });
+    // resourceLoad2 scroll listener
+    resourceLoad2.addEventListener('wheel', function(event) {
+        if (event.deltaY > 85 && resourceData2.length > 1 && findBtn.textContent == "查找") { // Trigger on long scroll
+            // console.log("resourceData2RowIn increased:", resourceData2RowIn);
+            resourceData2RowIn++;
+            infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2]);
+        } else if (event.deltaY < 85 && resourceData2RowIn > 0) {
+            // console.log("resourceData2RowIn decreased:", resourceData2RowIn);
+            resourceData2RowIn--;
+            infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2]);
+        }
+
+
+        if (event.deltaY > 85 && resourceData2.length > 1 && findBtn.textContent == "取消") { // Trigger on long scroll
+            resourceData2FindRowIn++;
+            Inp = textareaFindInp.value
+            infoSimpleReqest("find",0,[resourceData2FindRowIn,row_of_resourceData2,Inp])
+        } else if (event.deltaY < 85 && resourceData2FindRowIn > 0) {
+            resourceData2FindRowIn--;
+            Inp = textareaFindInp.value
+            infoSimpleReqest("find",0,[resourceData2FindRowIn,row_of_resourceData2,Inp])
+        }
+    });
+    // handleLoad scroll listener
+    handleLoad.addEventListener('wheel', function(event) {
+        if (event.deltaY > 85 && handleData.length > 1) {
+            handleDataRowIn++;
+            // console.log("handleDataRowIn increased:", handleDataRowIn);
+            infoSimpleReqest("query", 1, [handleDataRowIn, row_of_handleData]);
+        } else if (event.deltaY < 85 && handleDataRowIn > 0) {
+            handleDataRowIn--;
+            // console.log("handleDataRowIn decreased:", handleDataRowIn);
+            infoSimpleReqest("query", 1, [handleDataRowIn, row_of_handleData]);
+        }
+    });
+    // searchLoad scroll listener
+    searchLoad.addEventListener('wheel', function(event) {
+        if (event.deltaY > 85 && searchData.length > 1) {
+            searchDataRowIn++;
+            // console.log("searchDataRowIn increased:", searchDataRowIn);
+            infoSimpleReqest("query", 2, [searchDataRowIn, row_of_searchData]);
+        } else if (event.deltaY < 85 && searchDataRowIn > 0) {
+            searchDataRowIn--;
+            // console.log("searchDataRowIn decreased:", searchDataRowIn);
+            infoSimpleReqest("query", 2, [searchDataRowIn, row_of_searchData]);
+        }
+        // printInfo("ok")
+    });
+
+// click event    
+    function resourceSQLADD(){
+        const resourceInp = textareaResource.value
+        // console.log(resourceInp)
+        if(resourceInp == ""){
+            // alert("请输入内容")
+            textareaResource.focus();
+            return
+        }
+        resourceData1RowIn = 0
+        infoSimpleReqest("change",0,[resourceInp,""])
+        setTimeout(() => {
+            infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2]);
+            console.log("Delay of 1 second executed.");
+        }, 250);
+        // infoSimpleReqest("query",0.5,[resourceData2RowIn,row_of_resourceData2])
+    }    // _______auther: moogiegik
+    function handleSQLADD(){
+        const Inp = textareaHandleTxInp.value
+        if(Inp == ""){
+            textareaHandleTxInp.focus();
+            return
+        }
+        const Inp2 = textareaHandleReInp.value
+        if(Inp2 == ""){
+            textareaHandleReInp.focus();
+            return
+        }
+        resourceData1RowIn = 0
+        infoSimpleReqest("change",1,[Inp,Inp2])
+    }
+    function findSQL(){
+        const Inp = textareaFindInp.value
+        if(Inp == ""){
+            textareaFind.focus();
+            return
+        }
+        if(findBtn.textContent == "查找"){
+            resourceData2FindRowIn = 0;
+            infoSimpleReqest("find",0,[resourceData2FindRowIn,row_of_resourceData2,Inp])
+            findBtn.textContent = "取消";
+            findBtn.style.border = "1px solid #00cbff"
+        }
+        else if(findBtn.textContent == "取消"){
+            findBtn.textContent = "查找";
+            //resourceData2FindRowIn = 0
+            infoSimpleReqest("query",0.5,[resourceData2RowIn,row_of_resourceData2])
+            findBtn.style.border = "1px solid green"
+        }
+
+    }
+
+    function SearchSQLADD(){
+        const Inp = textareaSearchWbInp.value
+        if(Inp == ""){
+            textareaSearchWbInp.focus();
+            return
+        }
+        const Inp2 = textareaSearchReInp.value
+        if(Inp2 == ""){
+            textareaSearchReInp.focus();
+            return
+        }
+        const Inp3 = textareaSearchNMInp.value
+        if(Inp3 == ""){
+            textareaSearchNMInp.focus();
+            return
+        }
+        resourceData1RowIn = 0
+        infoSimpleReqest("change",2,[Inp,Inp2,Inp3])
+    }
+    
+    function doRegular(originalString,replacement,regexString){
+        const result = originalString.replace(str2reg(regexString), replacement);
+        // console.log(result); // 输出：我是Kimi
+        return result
+    }
+    // _______auther: moogiegik
+    function str2reg(regexStr) {
+        // 去掉字符串的开头和结尾的斜杠
+        const patternWithFlags = regexStr.slice(1);
+
+        // 分割模式和标志
+        const parts = patternWithFlags.split('/');
+        const pattern = parts[0];
+        const flags = parts[1] || '';
+
+        console.log("str2reg:","\nolr:",regexStr,"\nsplit:",parts,"\npattern:",pattern,"\nflags:",flags)
+
+        // 使用 RegExp 构造函数创建正则表达式对象
+        return new RegExp(pattern, flags);
+    }
+
+    function findFirstDivsInChildDivs(parentId) {
+        const parentDiv = document.getElementById(parentId);
+        // 检查父 div 是否存在
+        if (!parentDiv) {
+            // console.log("No div found with id:", parentId);
+            return;
+        }
+        // console.log("findFirstDivsInChildDivs: parentDiv", parentDiv);
+        const childDivs = parentDiv.querySelectorAll('.resourceSelect');
+        // console.log("findFirstDivsInChildDivs: childDivs", childDivs);
+        childDivs.forEach(childDiv => {
+            childDiv.style.background = "";
+        });
+    }
+
+//keybord
+    resourceInp.addEventListener('keydown', e => {
+        // console.log('按下：', e.key, '代码：', e.code);
+        if(e.key === 'Enter' && !e.shiftKey && !e.shiftKey){
+            e.preventDefault();                     // 阻止插入 \n
+            resourceSQLADD()
+        }
+    });
+    messageInp.addEventListener('keydown', e => {
+        // console.log('按下：', e.key, '代码：', e.code);
+        if(e.key === 'Enter' && !e.shiftKey && !e.shiftKey){
+            e.preventDefault();                     // 阻止插入 \n
+            sendMsg(messageName.value+':'+ messageInp.value);
+            messageInp.value='';
+        }
+    });    // _______auther: moogiegik
+// CreateDivs
+    function SearchCreateDivs(parentDiv,showData,innerData){
+        // console.log("SearchCreateDivs",showData,innerData)
+        // return
+        for(var i = 0;i<showData.length;i++){
+            const div = document.createElement('div');
+            div.style.display = "flex";//ow an element is displayed in the layout
+            div.style.flexWrap = "nowrap";//emain on a single line, even if they exceed the container's width. 
+            div.style.alignItems = "center";
+            div.style.marginTop = itemTrue_MG_top_Height+"px";
+            div.style.height = parentItemHeight+"px";
+            // console.log("showData[0]",showData[0])
+            // rnum = Math.floor(Math.random() * basicColors.length+1)-1
+            rnum = i-Math.floor(i/basicColors.length)*basicColors.length
+
+            for(var j = innerData.length-1;j>=0;j--){
+                var innerDiv = document.createElement("div");
+                innerDiv.className = "white_border_radius"
+                innerDiv.style.display = "flex"
+                innerDiv.style.textAlign = "center"
+                // innerDiv.style.justifyContent = "center"
+                innerDiv.style.height = itemHeight + "px";
+                innerDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+                // innerDiv.style.fontSize = "0.8em"; // 
+                // innerDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                innerDiv.style.userSelect = "none"; // 禁止文本选择
+                innerDiv.dataset.info = JSON.stringify(showData[i]);
+                innerDiv.style.whiteSpace = "nowrap"; // 不换行
+                innerDiv.style.overflow = "hidden"; // 隐藏超出部分
+                innerDiv.style.textOverflow = "ellipsis"; // 显示省略号
+
+                if(innerData[j] == "删"){
+                    innerDiv.style.width = "6%"
+                    innerDiv.textContent = innerData[j];
+                    innerDiv.addEventListener("dblclick", function(event) {
+                        infoSimpleReqest("change",2,[JSON.parse(event.target.dataset.info)[0]])
+                    });
+                }else if(innerData[j] == "选"){
+                    innerDiv.style.width = "34%"
+                    innerDiv.textContent = showData[i][3];   
+                    innerDiv.addEventListener("click", function(event) {
+                        textareaSearchWbInp.value = JSON.parse(event.target.dataset.info)[1];
+                        textareaSearchReInp.value = JSON.parse(event.target.dataset.info)[2];
+                        textareaSearchNMInp.value = JSON.parse(event.target.dataset.info)[3];
+                        selectedHandle[2]
+                        // console.log("TTTTTTTTT",selectedHandle,JSON.parse(event.target.dataset.info))
+                        // console.log("SSSSSSSSS",JSON.parse(event.target.dataset.info)[1],selectedHandle[2],(JSON.parse(event.target.dataset.info)[2]))
+                        web = doRegular(JSON.parse(event.target.dataset.info)[1],selectedHandle[2],JSON.parse(event.target.dataset.info)[2])
+                        // console.log("web",web)
+                        textareaSearchWbInp.value = web;
+                        window.open(web, '_blank');
+                    });
+                }
+                div.appendChild(innerDiv)
+            }
+            
+            for(var k = 0;k<showData[0].length-2;k++){
+                var newDiv = document.createElement("div");           
+                newDiv.className = "white_border_radius"
+                newDiv.style.height = itemHeight + "px";
+                newDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+                // newDiv.style.fontSize = "0.7em"; // 
+                newDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                // newDiv.style.border = "1px solid chartreuse"; // 设置边框颜色
+                if(k == 0){
+                    newDiv.style.width = "30%"
+                    newDiv.innerText =  showData[i][1];
+                }else{
+                    newDiv.style.width = "20%"
+                    newDiv.innerText =  showData[i][2];
+                    // newDiv.style.border = "1px solid green"; // 设置边框颜色
+                }
+                newDiv.style.whiteSpace = "nowrap"; // 不换行
+                newDiv.style.overflow = "hidden"; // 隐藏超出部分
+                newDiv.style.textOverflow = "ellipsis"; // 显示省略号
+                div.appendChild(newDiv)
+            }
+            
+    // _______auther: moogiegik
+            parentDiv.appendChild(div);
+        }
+    }
+
+    function handleCreateDivs(parentDiv,showData,innerData){
+        // console.log("handleCreateDivs",showData,innerData)
+        // return
+        for(var i = 0;i<showData.length;i++){
+            const div = document.createElement('div');
+            div.style.display = "flex";//ow an element is displayed in the layout
+            div.style.flexWrap = "nowrap";//emain on a single line, even if they exceed the container's width. 
+            div.style.alignItems = "center";
+            // rnum = Math.floor(Math.random() * basicColors.length+1)-1
+            rnum = i-Math.floor(i/basicColors.length)*basicColors.length
+            div.style.marginTop = itemTrue_MG_top_Height+"px";
+            div.style.height = parentItemHeight+"px";
+            // console.log("showData[0]",showData[0])
+            for(var j = innerData.length-1;j>=0;j--){
+                var innerDiv = document.createElement("div");
+                innerDiv.className = "white_border_radius"
+                innerDiv.textContent = innerData[j];
+                innerDiv.style.display = "flex"
+                innerDiv.style.textAlign = "center"
+                innerDiv.style.justifyContent = "center"
+                innerDiv.style.height = itemHeight + "px";
+                innerDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+                // innerDiv.style.fontSize = "0.8em"; // 
+                innerDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                innerDiv.style.userSelect = "none"; // 禁止文本选择
+                innerDiv.dataset.info = JSON.stringify(showData[i]);
+
+                if(innerData[j] == "删"){
+                    innerDiv.style.width = "3%"
+                    innerDiv.addEventListener("dblclick", function(event) {
+                        infoSimpleReqest("change",1,[JSON.parse(event.target.dataset.info)[0]])
+                    });
+                }else if(innerData[j] == "选"){
+                    innerDiv.style.width = "7%"
+                    innerDiv.className = "white_border_radius resourceSelect"
+                    if(selectedHandle[0] == showData[i][0]){
+                        innerDiv.style.background = "red"
+                    }    // _______auther: moogiegik
+                    innerDiv.addEventListener("click", function(event) {
+                        // selectedHandle = [showData[i][0],showData[i]]
+                        findFirstDivsInChildDivs("handleLoad")
+                        selectedHandle = [JSON.parse(event.target.dataset.info)[0],JSON.parse(event.target.dataset.info)]
+                        // console.log("selectedHandle", selectedHandle,JSON.parse(event.target.dataset.info))
+                        event.target.style.background = "red"
+                        // textareaHandleTxInp.value = JSON.parse(event.target.dataset.info)[1];
+                        textareaHandleReInp.value = JSON.parse(event.target.dataset.info)[2];
+
+                        selectedHandle[2] = doRegular(selectedHandle[1][1],textareaResource.value,selectedHandle[1][2])
+                        // console.log("TTTTTTT",selectedHandle[2],textareaResource.value)
+                        textareaHandleTxInp.value = selectedHandle[2]
+                    });
+                }
+                div.appendChild(innerDiv)
+            }
+            for(var k = 0;k<showData[0].length-1;k++){
+                var newDiv = document.createElement("div");           
+                newDiv.className = "white_border_radius"
+                newDiv.style.height = itemHeight + "px";
+                newDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+                // newDiv.style.fontSize = "0.7em"; // 
+                //rnum = Math.floor(Math.random() * basicColors.length+1)-1
+                //newDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                newDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                // newDiv.style.border = "1px solid chartreuse"; // 设置边框颜色
+
+                if(k == 0){
+                    newDiv.style.width = "65%"
+                    newDiv.innerText = showData[i][1];
+                }else{
+                    newDiv.style.width = "15%"
+                    newDiv.innerText = showData[i][2];
+                    //newDiv.style.border = "1px solid green"; // 设置边框颜色
+                }
+                newDiv.style.whiteSpace = "nowrap"; // 不换行
+                newDiv.style.overflow = "hidden"; // 隐藏超出部分
+                newDiv.style.textOverflow = "ellipsis"; // 显示省略号
+                div.appendChild(newDiv)
+            }
+            parentDiv.appendChild(div);
+        }
+    }    // _______auther: moogiegik
+
+    function resourceCreateDivs(parentDiv,showData,innerData){
+        for(var i = 0;i<showData.length;i++){
+            const div = document.createElement('div');
+            div.style.display = "flex";//ow an element is displayed in the layout
+            div.style.flexWrap = "nowrap";//emain on a single line, even if they exceed the container's width. 
+            div.style.alignItems = "center";
+            div.style.marginTop = itemTrue_MG_top_Height+"px";
+            div.style.height = parentItemHeight+"px";
+            // div.style.width = "100%"
+            // div.style.display = "flex"
+            var newDiv = document.createElement("div");           
+
+            newDiv.className = "white_border_radius"
+            newDiv.style.height = itemHeight + "px";
+            newDiv.style.width = "90%"
+            newDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+            newDiv.style.fontSize = "0.8em"; // 
+            newDiv.innerText =  showData[i][0].slice(3,8) + "：" + showData[i][1];
+
+            // rnum = Math.floor(Math.random() * basicColors.length+1)-1
+            rnum = i-Math.floor(i/basicColors.length)*basicColors.length
+            newDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+            // newDiv.style.border = "1px solid chartreuse"; // 设置边框颜色
+            // console.log("rnum",rnum)
+            newDiv.style.whiteSpace = "nowrap"; // 不换行
+            newDiv.style.overflow = "hidden"; // 隐藏超出部分
+            newDiv.style.textOverflow = "ellipsis"; // 显示省略号
+            
+            newDiv.dataset.info = JSON.stringify(showData[i][1]);
+            newDiv.addEventListener('mouseover', (event) => {
+                //tipfull.innerText =  showData[i][0].slice(3,8) + "：" + showData[i][1];
+                //tipfull.textContent =JSON.parse(event.target.dataset.info);
+                textareaResource.value = JSON.parse(event.target.dataset.info);
+                //tipfull.style.display = 'block';
+                //tipfull.style.left = `${event.pageX + 30}px`;
+                //tipfull.style.top = `${event.pageY + 20}px`;
+            });
+            newDiv.addEventListener('mouseout', () => {
+                tipfull.style.display = 'none';
+                textareaResource.value = textareaResourceValue;
+                // console.log("ok","textareaResourceValue",textareaResourceValue);
+            });    // _______auther: moogiegik
+            div.appendChild(newDiv);
+            for(var j = 0;j<innerData.length;j++){
+                var innerDiv = document.createElement("div");
+                innerDiv.className = "white_border_radius"
+                innerDiv.style.display = "flex"
+                innerDiv.textContent = innerData[j];
+                innerDiv.style.textAlign = "center"
+                innerDiv.style.justifyContent = "center"
+                innerDiv.style.textAlign = "center";
+                innerDiv.style.height = itemHeight + "px";
+                innerDiv.style.lineHeight = itemHeight + "px"; // 使文字垂直居中
+                // innerDiv.style.fontSize = "0.8em"; // 
+                innerDiv.style.border = "1px solid "+ basicColors[rnum]; // 设置边框颜色
+                innerDiv.style.userSelect = "none"; // 禁止文本选择
+                // innerDiv.dataset.info = [showData[i][0],showData[i][1]]; // Attach info to innerDiv
+                // console.log("innerDiv",showData[i])
+                innerDiv.dataset.info = JSON.stringify(showData[i]);
+                // innerDiv.addEventListener('dblclick', openEvent);
+                // addEventListener('click', function() {alert('按钮被点击了！');});
+                if(innerData[j] == "删"){
+                    innerDiv.style.width = "3%"
+                    innerDiv.addEventListener("dblclick", function(event) {
+                        // event.stopPropagation(); // 阻止事件冒泡
+                        // console.log("dadddddddddddd",event.target.dataset.info)
+                        // console.log("dadddddddddddd",JSON.parse(event.target.dataset.info)[0])
+                        // console.log("dadddddddddddd",JSON.parse(event.target.dataset.info)[1])
+                        infoSimpleReqest("change",0,[JSON.parse(event.target.dataset.info)[0]],150)
+                        setTimeout(() => {
+                            infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2],100);
+                            // console.log("Delay of 1 second executed.");
+                        }, 300);
+                        // infoSimpleReqest("query",0.5,[resourceData2RowIn,row_of_resourceData2])  
+                    });
+                    innerDiv.addEventListener('mousemove', (event) => {
+                        //tipfull.innerText =  showData[i][0].slice(3,8) + "：" + showData[i][1];
+                        cont = JSON.parse(event.target.dataset.info);
+                        cont = cont[0].slice(0,14);
+                        tipfull.textContent =cont;
+                        tipfull.style.display = 'block';
+                        tipfull.style.left = `${event.pageX + 10}px`;
+                        tipfull.style.top = `${event.pageY + 10}px`;
+                    });
+                    innerDiv.addEventListener('mouseout', () => {
+                        tipfull.style.display = 'none';
+                    });    // _______auther: moogiegik
+                }else if(innerData[j] == "选"){
+                    innerDiv.style.width = "7%"
+                    innerDiv.className = "white_border_radius resourceSelect"
+                    innerDiv.addEventListener("click", function(event) {
+                        // event.stopPropagation(); // 阻止事件冒泡
+                        // const siblingText = event.target.parentElement.querySelector('div').innerText;
+                        // textareaResource.value = siblingText.slice(0, -7);
+                        selectedHandle[2] = doRegular(selectedHandle[1][1],JSON.parse(event.target.dataset.info)[1],selectedHandle[1][2])
+                        textareaHandleTxInp.value = selectedHandle[2]
+                        textareaResourceValue = JSON.parse(event.target.dataset.info)[1]
+                        // console.log("doRegular", selectedHandle,JSON.parse(event.target.dataset.info))
+                        textareaResource.value = JSON.parse(event.target.dataset.info)[1];
+                    });
+                    innerDiv.addEventListener('mouseover', (event) => {
+                        //tipfull.innerText =  showData[i][0].slice(3,8) + "：" + showData[i][1];
+                        cont = JSON.parse(event.target.dataset.info);
+                        cont =  cont[1];
+                        tipfull.textContent =cont;
+                        tipfull.style.display = 'block';
+                        tipfull.style.left = `${event.pageX + 10}px`;
+                        tipfull.style.top = `${event.pageY + 10}px`;
+                    });
+                    innerDiv.addEventListener('mouseout', () => {
+                        tipfull.style.display = 'none';
+                    });
+                }
+
+                div.appendChild(innerDiv)
+            }
+            parentDiv.appendChild(div);
+        }    // _______auther: moogiegik
+    }
+
+// request
+function infoSimpleReqest(type,table,data,delay=0){//pickup,open
+        // showRunningPosition("infoSimpleReqest",0)
+        $.ajax({
+            url: '/info/infoSimpleReqest',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({"type":type,"table":Math.floor(table),"data":data}),  // 打包为JSON格式
+            success: function(response) {
+                // if(response.get("result")=="successfully!"){
+                // console.log("response",response["result"])
+                // console.log("response",response);
+                if(type == "change"){
+                    // sendMsg("hello infoSimpleReqest")
+                    sendMsg_Json(type,table,delay,response)
+                }
+                afterInfoSimpleReqest(type,table,delay,response);
+            },
+            error: function(error) {
+                $('#result').text('Error:', error)
+            }
+        })
+        // showRunningPosition("infoSimpleReqest",1)
+    }
+
+function afterInfoSimpleReqest(type,table,delay,response){
+    // console.log("hang-------------",row_of_resourceData1,row_of_resourceData2)
+    // console.log("infoSimpleReqest(type,table,delay,response)",type,table,delay,response)
+    if(type == "change"){
+        console.log("handle on change")
+        if(table == 0){
+            // console.log("requet:","query",table,[0,row_of_resourceData1+row_of_resourceData2])
+            infoSimpleReqest("query",table,[resourceData1RowIn,row_of_resourceData1],delay)
+            // console.log("resourceData",resourceData)
+            // refreshResourceData(resourceData1,resourceData2)
+        }else if(table == 0.5){          
+            // console.log("requet:","query",table,[0,row_of_resourceData1+row_of_resourceData2])
+            infoSimpleReqest("query",table,[resourceData2RowIn,row_of_resourceData2],delay)
+            // console.log("resourceData",resourceData)
+            // refreshResourceData(resourceData1,resourceData2)
+        }else if(table == 1){
+            // console.log("requet:","query",table,[0,row_of_handleData])
+            infoSimpleReqest("query",table,[handleDataRowIn,row_of_handleData])
+            // console.log("handleData",handleData)
+            // refreshHandleData(handleData)
+        }else{
+            // console.log("requet:","query",table,[0,row_of_searchData])
+            infoSimpleReqest("query",table,[0,row_of_searchData])
+            // refreshSearchData(searchData)
+        }
+    }
+    else if(type == "query"){
+        console.log("handle on query")
+        if(table == 0){
+            // console.log("query response",response)
+            resourceData1 = response["data"]
+            resourceLoad1.innerHTML = ""; // 清空内容
+            // console.log("table 0 delay: ",delay)
+            if(delay>0){
+                // console.log("table 0 delay: ",delay)
+                setTimeout(() => {
+                    resourceCreateDivs(resourceLoad1,resourceData1,innerData)
+                }, delay);
+            }else{
+                resourceCreateDivs(resourceLoad1,resourceData1,innerData)
+            }
+    // _______auther: moogiegik
+            // console.log("resourceData1",resourceData1)
+            // resourceCreateDivs(resourceLoad1,resourceData1,innerData)
+            // refreshResourceData(resourceData1)
+        }else if(table == 0.5){
+            resourceData2 = response["data"]
+            resourceLoad2.innerHTML = ""; // 清空内容
+            if(delay>0){
+                // console.log("table 0.5 delay: ",delay)
+                setTimeout(() => {
+                    resourceCreateDivs(resourceLoad2,resourceData2,innerData)
+                }, delay);
+            }else{
+                // console.log("table 0.5 delay: ",delay)
+                resourceCreateDivs(resourceLoad2,resourceData2,innerData)
+            }
+            // resourceCreateDivs(resourceLoad2,resourceData2,innerData)
+            // refreshResourceData(resourceData1)
+        }else if(table == 1){
+            handleData = response["data"]
+            handleLoad.innerHTML = ""; // 清空内容
+            if(selectedHandle[1].length == 0 && handleData.length > 0){
+                selectedHandle = [handleData[0][0],handleData[0],handleData[0][1]]
+                textareaHandleTxInp.value = handleData[0][1]
+            }
+            handleCreateDivs(handleLoad,handleData,innerData)
+
+        }else if(table == 2){
+            searchData = response["data"]
+            searchLoad.innerHTML = ""; // 清空内容
+            SearchCreateDivs(searchLoad,searchData,innerData)
+        }
+    }
+    else if(type == "find"){
+        console.log("running on find")
+        resourceData2 = response["data"]
+        resourceLoad2.innerHTML = ""; // 清空内容
+        resourceCreateDivs(resourceLoad2,resourceData2,innerData)
+    }
+}
+// get local ip
+function getIP(type,data){//pickup,open
+  // console.log("getIP(type,data,ele)",type,data,ele)
+  $.ajax({
+      url: '/info/getIP',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({"data":data}),  // 打包为JSON格式
+      success: function(response) {
+          // console.log(response)
+          if(response[0]=="successfully!"){
+            var ip = "http://"+response[1]+":5005/info"
+            console.log(ip);
+            IP = ip;
+            //textareaFindInp.value = ip
+            copyToClipboard(ip)
+          }else{
+            IP = "fail IP"
+            //textareaFindInp.value = "fail IP"
+          }
+      },    // _______auther: moogiegik
+      error: function(error) {
+      }
+  })
+}
+
+// socketIO
+// 440 Hz 滴 0.15 s
+function beep_() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = 440;
+  g.gain.value = 0.3;
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + 0.50);
+}
+function niceBeep() {
+//   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let now = audioCtx.currentTime;
+
+  // 双振荡器：A5(880 Hz) → C6(1046.5 Hz)
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain  = audioCtx.createGain();
+
+  osc1.type = 'sine';
+  osc2.type = 'sine';
+  osc1.frequency.setValueAtTime(880, now);
+  osc2.frequency.setValueAtTime(880 * Math.pow(2, 3/12), now); // 小三度
+
+  // 指数衰减包络
+  gain.gain.setValueAtTime(0.25, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+
+  osc1.connect(gain);
+  osc2.connect(gain);
+  gain.connect(audioCtx.destination);
+    // _______auther: moogiegik
+  osc1.start(now);
+  osc2.start(now);
+  osc1.stop(now + 2.5);
+  osc2.stop(now + 2.5);
+}
+
+function sendMsg(text) {
+    if (!text) text = "say someting…";
+    // console.log("text..........",text)
+    if(text == "") text = "say someting…"
+    text = messageName.value+':'+ text
+    console.log("sendMsg  ",text)
+    socket.emit('message', text);  // 对应后端 @socketio.on('message')
+}
+socket.on('message', (data) => {  // 收到广播
+    console.log('Received message from server:', data);
+    messageReceved.value += data + "\n";
+    messageReceved.scrollTop = messageReceved.scrollHeight;
+    // new Audio(beep).play();              // 3. 播放提示音
+    niceBeep();
+});
+
+function sendMsg_Json(type,table,delay,response) {
+    // console.log("sendMsg response",response);
+    if (!type) return;
+    const payload = {
+        type: type,
+        table: table,
+        delay: delay,
+        response: response
+    };
+    // console.log("sendMsg_Json  ",payload)
+    socket.emit('message_Json', payload);  // 对应后端 @socketio.on('message')
+}
+socket.on('message_Json', (payload) => {
+//   console.log(payload);          // 已经是对象
+  console.log('Received message_Json from server:', payload);
+  afterInfoSimpleReqest(payload.type,payload.table,payload.delay,payload.response)
+  setTimeout(() => {
+        infoSimpleReqest("query", 0.5, [resourceData2RowIn, row_of_resourceData2],100);
+        // console.log("Delay of 1 second executed.");
+    }, 300);
+});
+    // _______auther: moogiegik
+async function copyToClipboard(text) {
+  try {
+      await navigator.clipboard.writeText(text);
+      console.log("复制成功！");
+  } catch (error) {
+      console.error("复制失败:", error);
+  }
+}
+
+window.onload = function() {
+    // 选择需要监听的元素
+    // const element = document.getElementById('resourceLoad1');
+    const elements = document.querySelectorAll('.observeSize');
+    // 创建 ResizeObserver 实例
+    const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        // const { width, height } = entry.contentRect; // 获取元素的宽度和高度
+        const { width, height } = entry.target.getBoundingClientRect(); // 获取元素的宽度和高度
+        showViewWidth = width
+        showViewHeight = height-LoadHeightLack
+
+        // console.log("container: width",width,"height",height,"row",rowNum,entry.target.id)
+        switch (entry.target.id) {
+            case "resourceLoad1":
+                row_of_resourceData1 = Math.floor(showViewHeight / itemTrueHeight); // 计算行数
+                console.log("row_of_resourceData1:",showViewHeight, itemTrueHeight,row_of_resourceData1);
+                infoSimpleReqest("query",0,[resourceData1RowIn,row_of_resourceData1])
+                break;
+            case "resourceLoad2":
+                row_of_resourceData2 = Math.floor(showViewHeight / itemTrueHeight); // 计算行数
+                var len = resourceData1.length
+                console.log("row_of_resourceData2:",showViewHeight, row_of_resourceData2,len);
+                infoSimpleReqest("query",0.5,[resourceData2RowIn,row_of_resourceData2])
+                break;
+            case "handleLoad":
+                row_of_handleData = Math.floor(showViewHeight/ itemTrueHeight); // 计算行数
+                console.log("row_of_handleData:", row_of_handleData);
+                infoSimpleReqest("query",1,[handleDataRowIn,row_of_handleData])
+                break;
+            case "searchLoad":
+                row_of_searchData = Math.floor(showViewHeight / itemTrueHeight); // 计算行数
+                console.log("row_of_searchData:", row_of_searchData);
+                infoSimpleReqest("query",2,[searchDataRowIn,row_of_searchData])
+                break;
+        }
+        // console.log("container: width",width,"height",height,"row",rowNum,entry.target.id)
+    }    // _______auther: moogiegik
+    });
+    // 监听该元素
+    // console.log(elements);
+    // 开始观察所有目标元素
+    // resizeObserver.observe(elements);    
+    elements.forEach((element) => {
+        resizeObserver.observe(element);
+    });
+    // resourceSQLADD(
+    textareaFindInp.value = getYesterdayDate()
+    //textareaFindInp.value = "25-06-11"
+
+    getIP('IP',null)
+}
+
+function checkUnlock() {
+//   const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  console.log("audioCtx.state:",audioCtx.state)
+  if (audioCtx.state === 'suspended') {
+    console.log("please allowAudio");
+    allowAudioDiv.style.display = 'flex';
+    allowAudioBtn.onclick = () => audioCtx.resume().then(() => {
+      audioUnlocked = true;
+      allowAudioDiv.style.display = 'none';
+      console.log("ok allowAudio");
+      checkUnlock();
+      niceBeep();
+      console.log("after audioCtx.state",audioCtx.state)
+    });
+  } else {
+    audioUnlocked = true;
+    allowAudioDiv.style.display = 'none';
+  }
+}    // _______auther: moogiegik
+checkUnlock();
+
+function getYesterdayDate() {
+    // 创建一个新的Date对象，表示当前日期和时间
+    const today = new Date();
+
+    // 获取昨天的日期，通过将天数减1
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    // 格式化日期为 YY-MM-DD
+    const year = String(yesterday.getFullYear()).slice(-2); // 获取年份的后两位
+    const month = String(yesterday.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要加1
+    const day = String(yesterday.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function showRunningPosition(info,flag = 0){
+    // console.log("showRunningPosition",info,flag)
+    if(flag == 0){
+        console.log(info+"  start +++++++++++++++++++++++++++++++++++++++++++++++++++")
+    }else if (flag == -1){
+        console.log("\n\n\n\n\n\n"+info+"  ？？？ +++++++++++----------------------++++++++++++++++++++")
+    }else{
+        console.log(info+"  end -----------------------------------------------------")
+    }
+}    // _______auther: moogiegik
+
+function printInfo(info){
+    console.log("\n\n",info,"+++++++++++++++++++++++++++++")
+    console.log("row_of_resourceData1",row_of_resourceData1)
+    console.log("row_of_resourceData2",row_of_resourceData2)
+    console.log("row_of_handleData",row_of_handleData)
+    console.log("row_of_searchData",row_of_searchData)
+
+    console.log("\n\n",info,".................+")
+
+    console.log("itemHeight",itemTrueHeight)
+    console.log("itemTrueHeight",itemTrueHeight)
+    
+    console.log("\n\n",info,".................+")
+
+    console.log("resourceLoad1",resourceLoad1.getBoundingClientRect())
+    console.log("resourceLoad2",resourceLoad2.clientHeight)
+    console.log("handleLoad",handleLoad.clientHeight)
+    console.log("searchLoad",searchLoad.getBoundingClientRect())
+
+    console.log("\n\n",info,".................+")
+
+    console.log("resourceLoad1",resourceLoad1.clientHeight/itemTrueHeight)
+    console.log("resourceLoad2",resourceLoad2.clientHeight/itemTrueHeight)
+    console.log("handleLoad",handleLoad.clientHeight/itemTrueHeight)
+    console.log("searchLoad",searchLoad.clientHeight/itemTrueHeight)
+
+    // console.log("row_of_searchData",row_of_searchData)
+    // console.log("searchLoad",searchLoad.getBoundingClientRect())
+    // console.log("searchLoad",searchLoad.clientHeight/itemTrueHeight)
+    // console.log("searchLoad",searchLoad.clientHeight-LoadHeightLack)
+    // gapPx = 5 + window.innerHeight * 0.005; 
+
+    console.log("gapPx",gapPx)
+
+    console.log("\n\n",info,"-----------------------------")
+}
+
+function testNet(){
+    console.log("\n\nin testNet ")
+    infoSimpleReqest("adf ","0,[0,6]","das")
+
+    // infoSimpleReqest("query",0,[0,6])
+
+}
+
+
+    // // Listen to the size change of resourceData2
+    // const observer2 = new MutationObserver(() => {
+    //     const newRowCount = resourceData2.length;
+    //     if (newRowCount !== row_of_resourceData2) {
+    //         row_of_resourceData2 = newRowCount;
+    //         console.log("Updated row_of_resourceData2:", row_of_resourceData2);
+    //     }
+    // });
+
+    // // Listen to the size change of handleData
+    // const observer3 = new MutationObserver(() => {
+    //     const newRowCount = handleData.length;
+    //     if (newRowCount !== row_of_handleData) {
+    //         row_of_handleData = newRowCount;
+    //         console.log("Updated row_of_handleData:", row_of_handleData);
+    //     }
+    // });
+
+    // // Listen to the size change of searchData
+    // const observer4 = new MutationObserver(() => {
+    //     const newRowCount = searchData.length;
+    //     if (newRowCount !== row_of_searchData) {
+    //         row_of_searchData = newRowCount;
+    //         console.log("Updated row_of_searchData:", row_of_searchData);
+    //     }
+    // });
+
+    // Observe changes in the respective elements
+    // observer1.observe(resourceLoad1, { childList: true, subtree: true });
+    // observer2.observe(resourceLoad2, { childList: true, subtree: true });
+    // observer3.observe(handleLoad, { childList: true, subtree: true });
+    // observer4.observe(searchLoad, { childList: true, subtree: true });
+
+
+
+
+</script>
+</html>
+
+
+<!-- 
+showView[i].addEventListener('click', function() {alert('按钮被点击了！');});   
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+-->

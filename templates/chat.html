@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>chat</title>
+  <link rel="icon" href="{{ url_for('static', filename='Personal or team information recording and text communication tools.png') }}" type="image/x-icon">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    #log {height:300px; border:1px solid #ccc; overflow-y:scroll;}
+  </style>
+</head>
+<body>
+  <h3>Mini Chat Room</h3>
+  <!-- <span>name：</span>
+  <input id="name" placeholder="说点什么…" value="111" size="40">
+  <br>
+  <br> -->
+  <!-- _______auther: moogiegik -->
+  <div id="log" style="border: lightblue 2px solid;height: 70vh;" ></div>
+  <br>
+  <span style="margin-left: 33vw;width:5vw;height:10vh;">name：</span>
+  <input id="name" placeholder="name…" style="margin-left: 0vw;width:5vw;height:10vh;" value="111">
+  <input id="msg" placeholder="say someting…" style="margin-left: 0vw;width:20vw;height:10vh;">
+  <button onclick="sendMsg()" style="width:5vw;height:10vh;">send</button>
+
+  <script>
+    const socket = io();  // 默认连到当前页面同源
+    const log = document.getElementById('log');
+    const inp = document.getElementById('msg');
+    const name = document.getElementById('name');
+
+    // _______auther: moogiegik
+
+    function sendMsg() {
+      var text = name.value.trim()+": "+inp.value.trim();
+      // console.log(text,text,inp.value.trim(),"inp.value",inp.textContent)
+      if(inp.value == "") text += "send something..."
+      if (!text) return;
+      socket.emit('message', text);  // 对应后端 @socketio.on('message')
+      // socket.emit('message', { type: 'chat', table: "A123", delay: 123 });
+      inp.value = '';
+    }
+    socket.on('message', (data) => {  // 收到广播
+      const p = document.createElement('div');
+      p.textContent = data;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+      console.log('Received message from server:', data);
+    });
+
+    socket.on('id', (data) => {  // 收到广播
+      const p = document.createElement('div');
+      if (!data.data) return;
+      name.value = "unkown"
+      p.textContent = name.value+": "+ "New ID added, default id:"+name.value;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+      console.log('Received ID from server:', data);
+    });
+    // _______auther: moogiegik
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+      // if (e.key === 'Enter' && e.ctrlKey) {
+          console.log('发送!');
+        e.preventDefault();   // 阻止浏览器默认行为（比如换页）
+        sendMsg()
+      }
+    });
+    // _______auther: moogiegik
+
+
+
+  </script>
+</body>
+</html>
