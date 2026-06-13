@@ -89,13 +89,6 @@ After running, open your browser and visit: http://127.0.0.1:5005 to access the 
 
 ![CHART](static/screenshots/home.JPG)
 
-### CHART Page
-### CHART页面
-
-![CHART](static/screenshots)
-![CHART](static/screenshots)
-
-
 ### NOTE Page
 ### NOTE页面
 
